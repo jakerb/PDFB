@@ -1,0 +1,4 @@
+@tables {id,forename,surname,email,password} 
+[1,"john","smith","jsmith@gmail.com", "plaintext"];
+[2,"steve","jobs","jobs@gmail.com", "password"];
+[3,"alan", "jackson", "ajack@mail.com", "hello1"];
