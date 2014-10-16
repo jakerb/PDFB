@@ -7,9 +7,16 @@
  * Version: 1.0 
  */
 
+	error_reporting(0);
+
 	class pfdb {
 
 		function __construct($db) {
+			$this->instantiate($db);
+		}
+
+		function instantiate($db) {
+			$this->dbName = $db;
 			$this->loadDb($db);
 			$this->loadTables();
 			$this->loadRecords();
@@ -70,8 +77,36 @@
 				$this->throwError("Zero results found");
 			}
 
+		}
 
-
+		function insert($q) {
+			$this->loadRecords();
+			$q = explode(",", $q);
+			if(count($q) == count($this->tables)) {
+				if($q[0] == "*") { //Autoincrement
+					$last = end($this->records);
+					$last = $last[$this->tables[0]];
+					$open = file_get_contents($this->dbName);
+					if(!isset($this->increment)) {
+						$this->increment = intval($last) + 1;
+					}
+					else {
+						$this->increment++;
+					}
+					$open .= "\n[".$this->increment.",";
+					foreach($q as $x) {
+						if($x != "*") {
+							$open .= "\"$x\",";
+						}
+					}
+					$open .= "];";
+					file_put_contents($this->dbName, str_replace(",];", "];", $open));
+					
+				}
+			}
+			else {
+				$this->throwError("Your query contains " . count($q) ." values and the database has " . count($this->tables) . " tables.");
+			}
 		}
 
 		function throwError($error) {
